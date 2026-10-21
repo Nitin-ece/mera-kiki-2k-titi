@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>MERAKI 2K27 — Cyberpunk 3D Cinematic Experience</title>
+    <meta name="description" content="Immersive 3D Möbius Racetrack & Autonomous Cyberpunk Automotive Experience for MERAKI 2K27." />
+    
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+      :root {
+        --bg-void: #030408;
+        --bg-panel: rgba(8, 14, 26, 0.65);
+        --bg-glass: rgba(14, 22, 40, 0.45);
+        --border-cyan: rgba(0, 245, 255, 0.28);
+        --border-magenta: rgba(255, 54, 209, 0.28);
+        --neon-cyan: #00f5ff;
+        --neon-magenta: #ff36d1;
+        --neon-violet: #845cff;
+        --text-primary: #f3f6ff;
+        --text-secondary: #8d9bb2;
+        --font-display: 'Orbitron', -apple-system, sans-serif;
+        --font-mono: 'Rajdhani', monospace, sans-serif;
+        --font-body: 'Inter', -apple-system, sans-serif;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html, body {
+        width: 100%;
+        background-color: var(--bg-void);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        overflow-x: hidden;
+        scrollbar-width: none;
+      }
+
+      html::-webkit-scrollbar, body::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Fixed 3D WebGL Canvas Layer */
+      #canvas-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      #webgl-canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+        outline: none;
+      }
+
+      /* Subtle Film Grain / Scanline Overlay */
+      .cinematic-vignette {
+        position: fixed;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        background: radial-gradient(circle at center, transparent 40%, rgba(2, 4, 8, 0.72) 100%),
+                    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+        background-size: 100% 100%, 100% 4px;
+      }
+
+      /* Fixed Cyber Header */
+      .cyber-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 22px 40px;
+        z-index: 50;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        background: linear-gradient(180deg, rgba(3, 4, 8, 0.85) 0%, rgba(3, 4, 8, 0) 100%);
+        border-bottom: 1px solid rgba(0, 245, 255, 0.08);
+      }
+
+      .brand-box {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .brand-logo {
+        font-family: var(--font-display);
+        font-size: 1.35rem;
+        font-weight: 900;
+        letter-spacing: 0.18em;
+        color: #ffffff;
+        text-shadow: 0 0 12px rgba(0, 245, 255, 0.6);
+        text-decoration: none;
+      }
+
+      .brand-badge {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        padding: 4px 10px;
+        border-radius: 4px;
+        background: rgba(0, 245, 255, 0.08);
+        border: 1px solid var(--border-cyan);
+        color: var(--neon-cyan);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .live-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: var(--neon-cyan);
+        box-shadow: 0 0 8px var(--neon-cyan);
+        animation: pulse 1.8s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.35; transform: scale(0.85); }
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        list-style: none;
+      }
+
+      .nav-link {
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.25s, text-shadow 0.25s;
+        cursor: pointer;
+      }
+
+      .nav-link:hover, .nav-link.active {
+        color: #ffffff;
+        text-shadow: 0 0 10px var(--neon-cyan);
+      }
+
+      .header-controls {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .audio-btn {
+        background: var(--bg-glass);
+        border: 1px solid var(--border-cyan);
+        color: var(--neon-cyan);
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        padding: 6px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        backdrop-filter: blur(8px);
+        transition: all 0.25s ease;
+      }
+
+      .audio-btn:hover {
+        background: rgba(0, 245, 255, 0.15);
+        box-shadow: 0 0 14px rgba(0, 245, 255, 0.3);
+      }
+
+      .btn-header-cta {
+        font-family: var(--font-display);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        padding: 9px 20px;
+        background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(255, 54, 209, 0.2));
+        border: 1px solid var(--neon-cyan);
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 0 12px rgba(0, 245, 255, 0.25);
+      }
+
+      .btn-header-cta:hover {
+        background: var(--neon-cyan);
+        color: #030408;
+        box-shadow: 0 0 22px rgba(0, 245, 255, 0.65);
+      }
+
+      /* Fixed Telemetry HUD (Right Side) */
+      .telemetry-hud {
+        position: fixed;
+        right: 32px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 40;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        pointer-events: none;
+      }
+
+      .telemetry-card {
+        background: var(--bg-panel);
+        border: 1px solid rgba(0, 245, 255, 0.18);
+        border-radius: 6px;
+        padding: 12px 18px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        width: 175px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        transition: border-color 0.3s;
+      }
+
+      .telemetry-card.drifting {
+        border-color: var(--neon-magenta);
+        box-shadow: 0 0 16px rgba(255, 54, 209, 0.3);
+      }
+
+      .hud-label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        color: var(--text-secondary);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+
+      .hud-val {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #ffffff;
+      }
+
+      .hud-val.cyan {
+        color: var(--neon-cyan);
+        text-shadow: 0 0 8px rgba(0, 245, 255, 0.5);
+      }
+
+      .hud-val.magenta {
+        color: var(--neon-magenta);
+        text-shadow: 0 0 8px rgba(255, 54, 209, 0.5);
+      }
+
+      .drift-status-indicator {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-weight: 700;
+        background: rgba(0, 245, 255, 0.1);
+        color: var(--neon-cyan);
+      }
+
+      .drift-status-indicator.active {
+        background: rgba(255, 54, 209, 0.25);
+        color: var(--neon-magenta);
+      }
+
+      /* Fixed Bottom Navigation Dots & Scroll Guide */
+      .cyber-bottom-bar {
+        position: fixed;
+        bottom: 24px;
+        left: 0;
+        width: 100%;
+        padding: 0 40px;
+        z-index: 45;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        pointer-events: none;
+      }
+
+      .stage-indicators {
+        display: flex;
+        gap: 12px;
+        pointer-events: auto;
+      }
+
+      .stage-dot {
+        width: 38px;
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+      }
+
+      .stage-dot.active {
+        background: var(--neon-cyan);
+        box-shadow: 0 0 12px var(--neon-cyan);
+        width: 58px;
+      }
+
+      .scroll-cue {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.16em;
+        color: var(--text-secondary);
+      }
+
+      .scroll-arrow {
+        animation: bounce 1.8s infinite;
+        color: var(--neon-cyan);
+      }
+
+      @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(5px); }
+      }
+
+      .coords-readout {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.14em;
+        color: rgba(141, 155, 178, 0.6);
+      }
+
+      /* -------------------------------------------------------------
+         Scroll Stages Container
+         ------------------------------------------------------------- */
+      #scroll-wrapper {
+        position: relative;
+        z-index: 10;
+        width: 100%;
+      }
+
+      .stage {
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        padding: 120px 8vw;
+        position: relative;
+        pointer-events: none;
+      }
+
+      .stage-content {
+        max-width: 580px;
+        pointer-events: auto;
+        opacity: 0;
+        transform: translateY(28px);
+        transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .stage.active .stage-content {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .stage-tag {
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        color: var(--neon-cyan);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .stage-tag::before {
+        content: '';
+        display: inline-block;
+        width: 14px;
+        height: 2px;
+        background: var(--neon-cyan);
+        box-shadow: 0 0 8px var(--neon-cyan);
+      }
+
+      .stage-title {
+        font-family: var(--font-display);
+        font-size: clamp(2.4rem, 5.2vw, 4.4rem);
+        font-weight: 900;
+        line-height: 1.05;
+        letter-spacing: 0.02em;
+        margin-bottom: 22px;
+        text-transform: uppercase;
+        background: linear-gradient(135deg, #ffffff 30%, #9cb3d8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .stage-title span.accent-cyan {
+        background: linear-gradient(135deg, #00f5ff 0%, #ffffff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .stage-title span.accent-magenta {
+        background: linear-gradient(135deg, #ff36d1 0%, #ffffff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .stage-desc {
+        font-size: 1.05rem;
+        line-height: 1.68;
+        color: var(--text-secondary);
+        margin-bottom: 32px;
+        font-weight: 400;
+      }
+
+      /* Interactive Button Styles */
+      .action-group {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+
+      .btn-primary {
+        font-family: var(--font-display);
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        padding: 14px 28px;
+        background: #00f5ff;
+        color: #030408;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 0 20px rgba(0, 245, 255, 0.45);
+      }
+
+      .btn-primary:hover {
+        background: #ffffff;
+        box-shadow: 0 0 32px rgba(0, 245, 255, 0.8);
+        transform: translateY(-2px);
+      }
+
+      .btn-secondary {
+        font-family: var(--font-mono);
+        font-size: 0.9rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        padding: 13px 26px;
+        background: var(--bg-glass);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        backdrop-filter: blur(8px);
+        transition: all 0.3s;
+      }
+
+      .btn-secondary:hover {
+        border-color: var(--neon-cyan);
+        color: var(--neon-cyan);
+        box-shadow: 0 0 16px rgba(0, 245, 255, 0.3);
+      }
+
+      /* Stage 01 Stats Ribbon */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-top: 36px;
+        padding-top: 24px;
+        border-top: 1px solid rgba(0, 245, 255, 0.12);
+      }
+
+      .stat-item-val {
+        font-family: var(--font-display);
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #ffffff;
+      }
+
+      .stat-item-lbl {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
+        color: var(--text-secondary);
+        margin-top: 4px;
+      }
+
+      /* Stage 02 (Close-up Follow Shot, Right-aligned) */
+      #stage-2 {
+        justify-content: flex-end;
+      }
+
+      .tech-specs-card {
+        background: var(--bg-panel);
+        border: 1px solid var(--border-cyan);
+        border-radius: 8px;
+        padding: 24px;
+        backdrop-filter: blur(16px);
+        margin-top: 24px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+      }
+
+      .spec-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        font-family: var(--font-mono);
+      }
+
+      .spec-row:last-child {
+        border-bottom: none;
+      }
+
+      .spec-name {
+        font-size: 0.8rem;
+        letter-spacing: 0.1em;
+        color: var(--text-secondary);
+      }
+
+      .spec-data {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--neon-cyan);
+      }
+
+      /* Stage 03 (Pillars Grid) */
+      .pillars-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        margin-top: 28px;
+      }
+
+      .pillar-card {
+        background: var(--bg-panel);
+        border: 1px solid rgba(255, 54, 209, 0.2);
+        border-radius: 6px;
+        padding: 16px;
+        backdrop-filter: blur(12px);
+        transition: all 0.3s;
+      }
+
+      .pillar-card:hover {
+        border-color: var(--neon-magenta);
+        box-shadow: 0 0 18px rgba(255, 54, 209, 0.35);
+        transform: translateY(-2px);
+      }
+
+      .pillar-icon {
+        font-family: var(--font-display);
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--neon-magenta);
+        margin-bottom: 6px;
+      }
+
+      .pillar-title {
+        font-family: var(--font-mono);
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 4px;
+      }
+
+      .pillar-desc {
+        font-size: 0.78rem;
+        line-height: 1.45;
+        color: var(--text-secondary);
+      }
+
+      /* Stage 04 (Final Reveal & Registration Form, Center-aligned) */
+      #stage-4 {
+        justify-content: center;
+        text-align: center;
+      }
+
+      #stage-4 .stage-content {
+        max-width: 680px;
+      }
+
+      #stage-4 .stage-tag {
+        justify-content: center;
+      }
+
+      .register-box {
+        background: var(--bg-panel);
+        border: 1px solid var(--border-cyan);
+        border-radius: 8px;
+        padding: 32px;
+        margin-top: 32px;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 245, 255, 0.12);
+      }
+
+      .form-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .cyber-input {
+        flex: 1;
+        background: rgba(4, 7, 14, 0.8);
+        border: 1px solid rgba(0, 245, 255, 0.3);
+        border-radius: 4px;
+        padding: 14px 18px;
+        color: #ffffff;
+        font-family: var(--font-mono);
+        font-size: 0.95rem;
+        letter-spacing: 0.05em;
+        outline: none;
+        transition: border-color 0.25s, box-shadow 0.25s;
+      }
+
+      .cyber-input:focus {
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 14px rgba(0, 245, 255, 0.4);
+      }
+
+      .cyber-select {
+        background: rgba(4, 7, 14, 0.8);
+        border: 1px solid rgba(0, 245, 255, 0.3);
+        border-radius: 4px;
+        padding: 14px 18px;
+        color: var(--neon-cyan);
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        outline: none;
+      }
+
+      .cyber-select option {
+        background: #04070e;
+        color: #ffffff;
+      }
+
+      .form-status-msg {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        margin-top: 12px;
+        color: var(--neon-cyan);
+        min-height: 20px;
+      }
+
+      /* Cyber Footer */
+      .cyber-footer {
+        width: 100%;
+        padding: 40px 8vw;
+        border-top: 1px solid rgba(0, 245, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(2, 3, 6, 0.95);
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        z-index: 20;
+        position: relative;
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 24px;
+        list-style: none;
+      }
+
+      .footer-links a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      .footer-links a:hover {
+        color: var(--neon-cyan);
+      }
+
+      /* -------------------------------------------------------------
+         Responsive Media Queries
+         ------------------------------------------------------------- */
+      @media (max-width: 900px) {
+        .cyber-header {
+          padding: 18px 24px;
+        }
+        .nav-links {
+          display: none;
+        }
+        .telemetry-hud {
+          right: 16px;
+          transform: scale(0.85) translateY(-50%);
+          transform-origin: right center;
+        }
+        .cyber-bottom-bar {
+          padding: 0 24px;
+        }
+        .coords-readout {
+          display: none;
+        }
+        .stage {
+          padding: 100px 6vw;
+        }
+        .form-row {
+          flex-direction: column;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .telemetry-hud {
+          display: none;
+        }
+        .brand-badge {
+          display: none;
+        }
+        .stage-title {
+          font-size: 2.2rem;
+        }
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+        .pillars-grid {
+          grid-template-columns: 1fr;
+        }
+        .cyber-footer {
+          flex-direction: column;
+          gap: 16px;
+          text-align: center;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Persistent 3D WebGL Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- Atmospheric Vignette & CRT Scanlines -->
+    <div class="cinematic-vignette"></div>
+
+    <!-- Cyber Header -->
+    <header class="cyber-header">
+      <div class="brand-box">
+        <a href="#stage-1" class="brand-logo">MERAKI 2K27</a>
+        <div class="brand-badge">
+          <span class="live-dot"></span>
+          <span>SYSTEM ONLINE // 2027.04</span>
+        </div>
+      </div>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a class="nav-link active" data-scroll="#stage-1">01 CIRCUIT</a></li>
+          <li><a class="nav-link" data-scroll="#stage-2">02 DYNAMICS</a></li>
+          <li><a class="nav-link" data-scroll="#stage-3">03 REALM</a></li>
+          <li><a class="nav-link" data-scroll="#stage-4">04 REVEAL</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-controls">
+        <button id="audio-toggle" class="audio-btn" aria-label="Toggle Sound">
+          <span id="audio-icon">🔇</span>
+          <span id="audio-text">AUDIO OFF</span>
+        </button>
+        <a href="#stage-4" class="btn-header-cta" data-scroll="#stage-4">CLAIM ACCESS</a>
+      </div>
+    </header>
+
+    <!-- Live Telemetry HUD (Right) -->
+    <aside class="telemetry-hud" aria-label="Vehicle Telemetry">
+      <div class="telemetry-card" id="hud-speed-card">
+        <div class="hud-label">
+          <span>VELOCITY</span>
+          <span class="drift-status-indicator" id="hud-drift-tag">CRUISING</span>
+        </div>
+        <div class="hud-val cyan"><span id="hud-speed">154</span> <small style="font-size:0.6em;color:#8d9bb2;">KM/H</small></div>
+      </div>
+
+      <div class="telemetry-card" id="hud-lateral-card">
+        <div class="hud-label">
+          <span>LATERAL G</span>
+          <span style="color:#00f5ff;">CORNERING</span>
+        </div>
+        <div class="hud-val"><span id="hud-gforce">0.34</span> <small style="font-size:0.6em;color:#8d9bb2;">G</small></div>
+      </div>
+
+      <div class="telemetry-card">
+        <div class="hud-label">
+          <span>SLIP ANGLE</span>
+          <span>DRIFT</span>
+        </div>
+        <div class="hud-val magenta"><span id="hud-slip">0.0</span>°</div>
+      </div>
+
+      <div class="telemetry-card">
+        <div class="hud-label">
+          <span>CIRCUIT PROGRESS</span>
+          <span id="hud-stage-num">01/04</span>
+        </div>
+        <div class="hud-val"><span id="hud-track-progress">12</span>%</div>
+      </div>
+    </aside>
+
+    <!-- Cyber Bottom Bar -->
+    <div class="cyber-bottom-bar">
+      <div class="stage-indicators">
+        <div class="stage-dot active" data-stage="1" title="Stage 01: Full Circuit"></div>
+        <div class="stage-dot" data-stage="2" title="Stage 02: Drift Dynamics"></div>
+        <div class="stage-dot" data-stage="3" title="Stage 03: World of Meraki"></div>
+        <div class="stage-dot" data-stage="4" title="Stage 04: Final Payoff"></div>
+      </div>
+
+      <div class="scroll-cue">
+        <span>SCROLL TO ENGAGE CHOREOGRAPHY</span>
+        <span class="scroll-arrow">↓</span>
+      </div>
+
+      <div class="coords-readout">
+        COORD: 35.6762° N // 139.6503° E
+      </div>
+    </div>
+
+    <!-- Scrollable Narrative Stages Container -->
+    <main id="scroll-wrapper">
+      <!-- STAGE 01: Wide Hero Establishing Shot -->
+      <section class="stage active" id="stage-1">
+        <div class="stage-content">
+          <div class="stage-tag">CYBER TECH EVENT // 2027</div>
+          <h1 class="stage-title">
+            IDEAS <br />
+            <span class="accent-cyan">BEYOND</span> <br />
+            LIMITS
+          </h1>
+          <p class="stage-desc">
+            The convergence of sovereign artificial intelligence, non-orientable topological engineering, and hyper-kinetic design. Enter a continuous Möbius circuit where velocity meets the infinite.
+          </p>
+
+          <div class="action-group">
+            <button class="btn-primary" data-scroll="#stage-2">
+              <span>EXPLORE EXPERIENCE</span>
+              <span>→</span>
+            </button>
+            <button class="btn-secondary" data-scroll="#stage-4">
+              <span>GET UPDATES</span>
+            </button>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-item-val">48 HRS</div>
+              <div class="stat-item-lbl">NON-STOP HACK</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-item-val">60+</div>
+              <div class="stat-item-lbl">KEYNOTES & PAPERS</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-item-val">3,000+</div>
+              <div class="stat-item-lbl">GLOBAL VISIONARIES</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STAGE 02: Close-up Car Follow & Drift Action -->
+      <section class="stage" id="stage-2">
+        <div class="stage-content">
+          <div class="stage-tag">01 / THE VEHICLE & TRAJECTORY</div>
+          <h2 class="stage-title">
+            FROM IDEAS <br />
+            <span class="accent-cyan">TO IMPACT</span>
+          </h2>
+          <p class="stage-desc">
+            Precision chassis telemetry synchronized with mathematical curvature. As the car cuts through extreme banking angles, active magnetic vectoring produces controlled slip dynamics without losing surface cohesion.
+          </p>
+
+          <div class="tech-specs-card">
+            <div class="spec-row">
+              <span class="spec-name">0–100 KM/H</span>
+              <span class="spec-data">1.84 SEC</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-name">DOWNFORCE VECTORING</span>
+              <span class="spec-data">4,200 N (DYNAMIC)</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-name">POWERTRAIN</span>
+              <span class="spec-data">QUAD CYBERDRIVE</span>
+            </div>
+            <div class="spec-row">
+              <span class="spec-name">TOPOLOGY TRACKING</span>
+              <span class="spec-data">NEURAL-SYNC 5.0</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STAGE 03: The World of Meraki -->
+      <section class="stage" id="stage-3">
+        <div class="stage-content">
+          <div class="stage-tag">02 / THE WORLD OF MERAKI</div>
+          <h2 class="stage-title">
+            EXPLORE THE <br />
+            <span class="accent-magenta">UNKNOWN</span>
+          </h2>
+          <p class="stage-desc">
+            An expansive cyberpunk technology exhibition engineered for founders, researchers, and creative coders. Discover four immersive thematic domains redefining the human-machine horizon.
+          </p>
+
+          <div class="pillars-grid">
+            <div class="pillar-card">
+              <div class="pillar-icon">01 // AI</div>
+              <div class="pillar-title">SOVEREIGN INTELLIGENCE</div>
+              <div class="pillar-desc">Autonomous multi-agent architectures and embodied robotics.</div>
+            </div>
+            <div class="pillar-card">
+              <div class="pillar-icon">02 // BCI</div>
+              <div class="pillar-title">NEURAL INTERFACES</div>
+              <div class="pillar-desc">Direct cortical telemetry and bi-directional sensory feedback.</div>
+            </div>
+            <div class="pillar-card">
+              <div class="pillar-icon">03 // KIN</div>
+              <div class="pillar-title">CYBER KINETICS</div>
+              <div class="pillar-desc">High-speed electric automotive dynamics and topological racing.</div>
+            </div>
+            <div class="pillar-card">
+              <div class="pillar-icon">04 // QPU</div>
+              <div class="pillar-title">QUANTUM SYSTEMS</div>
+              <div class="pillar-desc">Next-generation cryptographic lattices and quantum simulations.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STAGE 04: Final Cinematic Reveal & Call to Action -->
+      <section class="stage" id="stage-4">
+        <div class="stage-content">
+          <div class="stage-tag">03 / FINAL REVEAL & ACCESS</div>
+          <h2 class="stage-title">
+            THE NEXT ERA <br />
+            <span class="accent-cyan">BEGINS HERE.</span>
+          </h2>
+          <p class="stage-desc">
+            Early reservation is now open for MERAKI 2K27. Secure priority passes, access classified keynotes, and join the elite automotive and cybernetic collective.
+          </p>
+
+          <div class="register-box">
+            <form id="access-form" onsubmit="return false;">
+              <div class="form-row">
+                <input type="email" id="email-input" class="cyber-input" placeholder="ENTER YOUR ACCESS EMAIL..." required />
+                <select id="category-select" class="cyber-select">
+                  <option value="builder">BUILDER / DEVELOPER</option>
+                  <option value="researcher">AI RESEARCHER</option>
+                  <option value="founder">FOUNDER / VIP PASS</option>
+                  <option value="press">TECH PRESS / MEDIA</option>
+                </select>
+                <button type="submit" id="submit-btn" class="btn-primary">
+                  <span>SECURE ACCESS</span>
+                </button>
+              </div>
+              <div id="form-feedback" class="form-status-msg">ACCESS SYSTEM READY // ENTER CREDENTIALS</div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Cyber Footer -->
+    <footer class="cyber-footer">
+      <div>
+        © 2027 MERAKI 2K27. ALL RIGHTS RESERVED. TOPOLOGICAL CHOREOGRAPHY SYSTEM ACTIVE.
+      </div>
+      <ul class="footer-links">
+        <li><a href="#stage-1" data-scroll="#stage-1">OVERVIEW</a></li>
+        <li><a href="#stage-2" data-scroll="#stage-2">SPECIFICATIONS</a></li>
+        <li><a href="#stage-3" data-scroll="#stage-3">EXHIBITION</a></li>
+        <li><a href="#stage-4" data-scroll="#stage-4">PRIORITY REGISTRATION</a></li>
+      </ul>
+    </footer>
+
+    <!-- Main TypeScript Entry -->
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
