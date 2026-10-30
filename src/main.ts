@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -37,35 +38,37 @@ const container = document.getElementById('canvas-container') || document.body;
 
 const scene = new THREE.Scene();
 
-// Camera setup: centered perspective matching cinematic compositions
-const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 120);
-camera.position.set(0, 1.8, 8.2);
-camera.lookAt(0, 0, 0);
+// Camera setup: expansive perspective matching cinematic compositions
+const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 450);
+camera.position.set(2.5, 3.8, 9.2);
+camera.lookAt(0, 0.1, 0);
 
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
-  alpha: true,
+  alpha: false,
   powerPreference: 'high-performance',
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.12;
+renderer.toneMappingExposure = 0.98;
 renderer.domElement.id = 'webgl-canvas';
 container.appendChild(renderer.domElement);
 
-// Post-Processing: UnrealBloomPass for crisp neon racetrack & taillight highlights
+// Post-Processing: Minimal, subtle bloom to ensure nothing is lost in the glow
 const renderPass = new RenderPass(scene, camera);
 const bloomPass = new UnrealBloomPass(
   new THREE.Vector2(window.innerWidth, window.innerHeight),
-  0.46, // bloom strength
-  0.22, // radius
-  0.86  // threshold
+  0.16, // minimal bloom strength (subtle crisp edge glint)
+  0.14, // restrained radius
+  0.90  // high threshold so only fine neon accents register
 );
+const outputPass = new OutputPass();
 
 const composer = new EffectComposer(renderer);
 composer.addPass(renderPass);
 composer.addPass(bloomPass);
+composer.addPass(outputPass);
 
 // -------------------------------------------------------------
 // 3. Initialize Unified SceneController (Track, Car, Drift, Camera)
@@ -319,7 +322,7 @@ function animate(): void {
     osc2.frequency.setTargetAtTime(targetFreq * 3.8, audioCtx.currentTime, 0.08);
   }
 
-  // Render post-processed scene
+  // Render AAA cinematic post-processed frame with selective neon bloom & ACES Filmic mapping
   composer.render();
 }
 

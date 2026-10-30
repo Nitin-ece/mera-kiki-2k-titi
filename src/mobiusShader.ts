@@ -163,49 +163,60 @@ export function createMobiusShaderMaterial(): THREE.ShaderMaterial {
       );
       vec3 cyberBody = diffuse + iridColor * (fresnel * 0.38);
 
-      // Polished liquid chrome specular reflection
+      // Polished dark chrome specular reflection (restrained & clean)
       float chromeSpec = pow(NdotH, 64.0);
-      cyberBody += vec3(0.85, 0.92, 1.0) * chromeSpec * 0.75;
+      cyberBody += vec3(0.85, 0.92, 1.0) * chromeSpec * 0.35;
 
-      // Micro-engraved circuit traces
+      // Micro-engraved circuit traces (subtle)
       float circuit = getCircuitPattern(vUv);
       float circuitWave = sin(vProgressCoord * 24.0 - uTime * 3.0) * 0.5 + 0.5;
       vec3 circuitColor = mix(vec3(0.0, 0.65, 0.9), vec3(0.85, 0.1, 0.8), circuitWave);
-      cyberBody += circuitColor * circuit * 0.28;
+      cyberBody += circuitColor * circuit * 0.16;
 
-      // Electric cyan luminous edges along outer bevel
-      float edgeMask = smoothstep(0.55, 0.98, vEdgeFactor);
-      float edgePulse = 1.0 + 0.25 * sin(uTime * 4.0 + vProgressCoord * 12.0);
-      vec3 cyanNeon = vec3(0.0, 0.95, 1.0) * (edgeMask * 1.35 * edgePulse);
+      // Electric cyan clean edges along outer bevel (minimal, sharp, no blowout)
+      float edgeMask = smoothstep(0.65, 0.98, vEdgeFactor);
+      vec3 cyanNeon = vec3(0.0, 0.85, 1.0) * (edgeMask * 0.75);
 
-      // Hot magenta highlights around twist and curvature
+      // Restrained magenta highlights around twist and curvature
       float twistHighlight = pow(vTwistIntensity, 2.0) * fresnel;
-      vec3 magentaGlow = vec3(1.0, 0.06, 0.7) * (twistHighlight * 0.9);
+      vec3 magentaGlow = vec3(0.9, 0.08, 0.65) * (twistHighlight * 0.45);
 
-      // Thin neon center laser line
+      // Minimal directional speed chevrons flowing along the driving surface
+      float chevronPhase = fract(vProgressCoord * 48.0 - uTime * 2.4);
+      float chevronShape = smoothstep(0.08, 0.01, abs(chevronPhase - 0.5) + abs(vEdgeFactor - 0.15) * 0.5);
+      vec3 speedChevrons = vec3(0.0, 0.75, 0.9) * (chevronShape * 0.26 * (1.0 - edgeMask));
+
+      // Subtle Möbius crossing twist illumination
+      float twistZone = smoothstep(0.35, 0.95, vTwistIntensity);
+      vec3 twistAura = mix(vec3(0.0, 0.75, 0.9), vec3(0.85, 0.1, 0.7), sin(vProgressCoord * 12.56 + uTime * 3.5) * 0.5 + 0.5);
+      vec3 twistCrossingGlow = twistAura * (twistZone * 0.35 * (fresnel + 0.25));
+
+      // Thin crisp neon center laser line
       float centerStripe = smoothstep(0.035, 0.0, abs(vEdgeFactor - 0.08));
-      vec3 centerLineNeon = vec3(0.0, 0.8, 1.0) * centerStripe * 0.6;
+      vec3 centerLineNeon = vec3(0.0, 0.75, 0.9) * centerStripe * 0.35;
 
-      // Continuous traveling energy packet along the full Möbius loop
+      // Subtle traveling energy packet along the full Möbius loop
       float travelingPulse = smoothstep(0.96, 1.0, sin(vProgressCoord * 12.566 - uTime * 2.5));
-      vec3 pulseColor = mix(vec3(0.0, 1.0, 0.9), vec3(1.0, 0.1, 0.8), sin(vProgressCoord * 6.28) * 0.5 + 0.5);
-      vec3 pulseGlow = pulseColor * (travelingPulse * 0.7);
+      vec3 pulseColor = mix(vec3(0.0, 0.9, 0.8), vec3(0.9, 0.1, 0.7), sin(vProgressCoord * 6.28) * 0.5 + 0.5);
+      vec3 pulseGlow = pulseColor * (travelingPulse * 0.38);
 
       // Activation Wave (Animation B)
       vec3 activationWave = vec3(0.0);
       if (uActivationPulse >= 0.0) {
         float wave1 = smoothstep(0.1, 0.0, abs(vProgressCoord - uActivationPulse));
-        activationWave += vec3(0.0, 0.95, 1.0) * wave1 * 1.6;
+        activationWave += vec3(0.0, 0.85, 1.0) * wave1 * 0.75;
       }
       if (uActivationPulse2 >= 0.0) {
         float wave2 = smoothstep(0.12, 0.0, abs(vProgressCoord - uActivationPulse2));
-        activationWave += vec3(1.0, 0.08, 0.75) * wave2 * 1.3;
+        activationWave += vec3(0.9, 0.1, 0.7) * wave2 * 0.65;
       }
 
       // Combine Cyberpunk
       vec3 cyberpunkColor = cyberBody
         + cyanNeon
         + magentaGlow
+        + speedChevrons
+        + twistCrossingGlow
         + centerLineNeon
         + pulseGlow
         + activationWave;

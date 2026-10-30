@@ -109,29 +109,28 @@ export async function loadCyberpunkCar(): Promise<CarController> {
       envMapIntensity: 2.2,
     });
 
-    // 5. Electric Cyan Luminous Pinstripes, Front Grille, & Skirt Details
+    // 5. Electric Cyan Luminous Pinstripes, Front Grille, & Skirt Details (Minimal Clean Accent)
     const cyanPinstripeMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(0x00f5ff),
-      emissive: new THREE.Color(0x00f5ff),
-      emissiveIntensity: 3.8,
-      roughness: 0.18,
-      metalness: 0.2,
+      color: new THREE.Color(0x008da6),
+      emissive: new THREE.Color(0x006b80),
+      emissiveIntensity: 0.65,
+      roughness: 0.25,
+      metalness: 0.3,
     });
 
-    // 6. Detailed Cyan-White Headlight LEDs (ON)
+    // 6. Sleek Dark Tinted Headlight Housing (Headlights Removed / Off)
     headlightMaterial = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(0xffffff),
-      emissive: new THREE.Color(0x00f5ff),
-      emissiveIntensity: 4.8,
-      roughness: 0.08,
+      color: new THREE.Color(0x111620),
+      roughness: 0.2,
+      metalness: 0.9,
     });
 
-    // 7. Vivid Neon Red/Magenta Taillights & Rear Details
+    // 7. Subtle Clean Taillights & Rear Details
     taillightMaterial = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(0xff0044),
-      emissive: new THREE.Color(0xff0055),
-      emissiveIntensity: 3.8,
-      roughness: 0.15,
+      color: new THREE.Color(0x880020),
+      emissive: new THREE.Color(0xaa002a),
+      emissiveIntensity: 0.75,
+      roughness: 0.25,
     });
 
     // 8. Original Rubber Tires (Preserving exact geometry & textures)
@@ -253,22 +252,68 @@ export async function loadCyberpunkCar(): Promise<CarController> {
   }
 
   // -------------------------------------------------------------
-  // Studio Lighting on Vehicle (Cyan Key & Magenta Rim)
+  // Studio Lighting on Vehicle (Minimal & Restrained)
   // -------------------------------------------------------------
-  // Soft cyan light highlighting front grille and bodywork
-  const frontCyanLight = new THREE.PointLight(0x00f5ff, 1.8, 1.6);
-  frontCyanLight.position.set(0, 0.08, 0.28);
-  innerModelGroup.add(frontCyanLight);
-
-  // Soft magenta rim light highlighting rear aerodynamic curves
-  const rearMagentaLight = new THREE.PointLight(0xff36d1, 1.8, 1.6);
+  // Soft ambient magenta rim on rear aerodynamics
+  const rearMagentaLight = new THREE.PointLight(0xff36d1, 0.55, 1.2);
   rearMagentaLight.position.set(0, 0.08, -0.28);
   innerModelGroup.add(rearMagentaLight);
 
-  // Subtle underbody illumination (Electric Cyan)
-  const underbodyLight = new THREE.PointLight(0x00f5ff, 1.4, 1.2);
+  // Minimal underbody ambient
+  const underbodyLight = new THREE.PointLight(0x00a3cc, 0.35, 0.9);
   underbodyLight.position.set(0, 0.02, 0);
   innerModelGroup.add(underbodyLight);
+
+  // -------------------------------------------------------------
+  // Minimal Plasma Thruster Exhaust Plumes (Subtle Rear Jets)
+  // -------------------------------------------------------------
+  const thrusterGeo = new THREE.ConeGeometry(0.035, 0.26, 12, 1, true);
+  thrusterGeo.translate(0, -0.13, 0);
+  thrusterGeo.rotateX(-Math.PI / 2); // Point backwards along -Z
+
+  const thrusterMat = new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide,
+    uniforms: {
+      uTime: { value: 0 },
+      uBoost: { value: 0.0 },
+    },
+    vertexShader: /* glsl */ `
+      varying vec3 vLocalPos;
+      void main() {
+        vLocalPos = position;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      precision highp float;
+      uniform float uTime;
+      uniform float uBoost;
+      varying vec3 vLocalPos;
+
+      void main() {
+        float zNorm = -vLocalPos.z / 0.26;
+        float flameFlicker = sin(uTime * 35.0 + zNorm * 12.0) * 0.1 + 0.9;
+        float alpha = (1.0 - zNorm) * flameFlicker * (0.22 + uBoost * 0.25);
+
+        vec3 cyanCore = vec3(0.0, 0.7, 0.9) * 1.2;
+        vec3 violetRim = vec3(0.65, 0.1, 0.6) * 0.9;
+        vec3 color = mix(cyanCore, violetRim, zNorm);
+
+        gl_FragColor = vec4(color, alpha);
+      }
+    `,
+  });
+
+  const leftThruster = new THREE.Mesh(thrusterGeo, thrusterMat);
+  leftThruster.position.copy(leftThrusterLocal);
+  innerModelGroup.add(leftThruster);
+
+  const rightThruster = new THREE.Mesh(thrusterGeo, thrusterMat);
+  rightThruster.position.copy(rightThrusterLocal);
+  innerModelGroup.add(rightThruster);
 
   function update(
     delta: number,
@@ -279,20 +324,31 @@ export async function loadCyberpunkCar(): Promise<CarController> {
     suspension: number,
     isBoosting: boolean
   ): void {
-    // Preserve original geometry: apply chassis yaw, roll, and suspension
+    // Apply dynamic chassis yaw, roll, and suspension
     innerModelGroup.rotation.y = driftYaw;
     innerModelGroup.rotation.z = roll;
     innerModelGroup.position.y = suspension;
 
-    // Dynamic light modulation
-    const pulse = 1.0 + Math.sin(time * 4.0) * 0.12;
-    frontCyanLight.intensity = (1.8 + (isBoosting ? 0.8 : 0.0)) * pulse;
-    rearMagentaLight.intensity = (1.8 + (isBoosting ? 0.8 : 0.0)) * pulse;
+    // Modulate subtle lighting
+    rearMagentaLight.intensity = 0.55 + (isBoosting ? 0.3 : 0.0);
+
+    // Thruster scale & intensity
+    thrusterMat.uniforms.uTime.value = time;
+    const targetBoost = isBoosting ? 1.0 : 0.0;
+    thrusterMat.uniforms.uBoost.value = THREE.MathUtils.lerp(
+      thrusterMat.uniforms.uBoost.value,
+      targetBoost,
+      delta * 6.0
+    );
+
+    const boostScale = 1.0 + (isBoosting ? 0.4 : 0.0);
+    leftThruster.scale.set(boostScale, boostScale, boostScale * 1.15);
+    rightThruster.scale.set(boostScale, boostScale, boostScale * 1.15);
   }
 
   function setTaillightIntensity(intensity: number): void {
     if (taillightMaterial) {
-      taillightMaterial.emissiveIntensity = 3.8 * intensity;
+      taillightMaterial.emissiveIntensity = 0.75 * intensity;
     }
   }
 
